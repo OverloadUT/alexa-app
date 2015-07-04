@@ -129,55 +129,46 @@ alexa.app = function(name,endpoint) {
 			response.fail = function(msg) {
 				reject(msg);
 			};
-			try {
-				var key;
-				// Copy all the session attributes from the request into the response so they persist.
-				// This should happen by default, but it seems to be a bug in the Alexa API (?)
-				if (request.sessionAttributes) {
-					for (key in request.sessionAttributes) {
-						response.session(key, request.sessionAttributes[key]);
-					}
+
+			var key;
+			// Copy all the session attributes from the request into the response so they persist.
+			// This should happen by default, but it seems to be a bug in the Alexa API (?)
+			if (request.sessionAttributes) {
+				for (key in request.sessionAttributes) {
+					response.session(key, request.sessionAttributes[key]);
 				}
-				var requestType = request.type();
-				if ("IntentRequest"===requestType) {
-					var intent = request_json.request.intent.name;
-					if (typeof self.intents[intent]!="undefined" && typeof self.intents[intent]['function']=="function") {
-						if (false!==self.intents[intent]['function'](request,response)) {
-							response.send();
-						}
-					}
-					else {
-						throw 'NO_INTENT_FOUND';
-					}
-				}
-				else if ("LaunchRequest"===requestType) {
-					if (typeof self.launchFunc=="function") {
-						if (false!==self.launchFunc(request,response)) {
-							response.send();
-						}
-					}
-					else {
-						throw 'NO_LAUNCH_FUNCTION';
-					}
-				}
-				else if ("SessionEndedRequest"===requestType) {
-					if (typeof self.sessionEndedFunc=="function") {
-						if (false!==self.sessionEndedFunc(request,response)) {
-							response.send();
-						}
+			}
+			var requestType = request.type();
+			if ("IntentRequest"===requestType) {
+				var intent = request_json.request.intent.name;
+				if (typeof self.intents[intent]!="undefined" && typeof self.intents[intent]['function']=="function") {
+					if (false!==self.intents[intent]['function'](request,response)) {
+						response.send();
 					}
 				}
 				else {
-					throw 'INVALID_REQUEST_TYPE';
+					throw 'NO_INTENT_FOUND';
 				}
-			} catch(e) {
-				if (typeof self.error=="function") {
-					self.error(e,request,response);
+			}
+			else if ("LaunchRequest"===requestType) {
+				if (typeof self.launchFunc=="function") {
+					if (false!==self.launchFunc(request,response)) {
+						response.send();
+					}
 				}
-				else if (typeof e=="string" && self.messages[e]) {
-					response.say(self.messages[e]);
+				else {
+					throw 'NO_LAUNCH_FUNCTION';
 				}
-				response.send();
+			}
+			else if ("SessionEndedRequest"===requestType) {
+				if (typeof self.sessionEndedFunc=="function") {
+					if (false!==self.sessionEndedFunc(request,response)) {
+						response.send();
+					}
+				}
+			}
+			else {
+				throw 'INVALID_REQUEST_TYPE';
 			}
 		});
 	};
