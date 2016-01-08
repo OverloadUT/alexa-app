@@ -8,8 +8,6 @@
  or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
-var Numbered = require('numbered');
-
 'use strict';
 
 // Util functions for generating valid SSML from plain text
@@ -23,11 +21,7 @@ var ssml = (function () {
             } else {
                 current_ssml = '';
             }
-            if (str.match(/[0-9]/)) {
-                str = str.replace(/[0-9]+(.[0-9])?(?![^<]+>)/g, function (num) {
-                    return Numbered.stringify(num).replace(/-/g, ' ');
-                });
-            }
+
             //TODO: Need a library with how to easily construct these statements with appropriate spacing, etc.
             //TODO: make sure all attribute values are surrounded by "..."
             var ssml_str = '<speak>' + current_ssml + (current_ssml === '' ? '' : ' ') + str + '</speak>';
